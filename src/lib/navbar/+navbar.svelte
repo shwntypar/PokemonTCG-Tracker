@@ -3,10 +3,16 @@
     const toggleMenu = () => isOpen = !isOpen;
 </script>
 
+<style>
+    a {
+        font-weight: bold;
+    }
+</style>
+
 <nav class="sticky top-0 bg-gray-800 p-4 z-50">
     <div class="container mx-auto flex justify-between items-center">
         <div class="text-white text-lg font-bold">
-            <a href="/">PokeTrack</a>
+            <h1>PokeTrack</h1>
         </div>
 
         <!-- Hamburger menu for mobile -->
