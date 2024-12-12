@@ -44,10 +44,10 @@
                     alt={card.name} 
                     class="w-full h-auto object-cover mx-auto"
                 >
-                <div class="text-start p-4">
-                    <h2 class="text-lg font-bold mb-2">{card.name}</h2>
-                    <p class="text-gray-600">Rarity: {card.rarity}</p>
-                    <p class="text-gray-600">Type {card.type}</p>
+                <div class="flex-col text-start p-4">
+                    <h2 class="text-md font-bold mb-2">{card.name}</h2>
+                    <p class="text-gray-600 text-sm">Rarity: {card.rarity}</p>
+                    <p class="text-gray-600 text-sm">Type: {card.type}</p>
                 </div>
             </div>
         {/each}
