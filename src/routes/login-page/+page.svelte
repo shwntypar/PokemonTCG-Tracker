@@ -1,18 +1,33 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { api } from "$lib/services/api.ts";
     
-    let username: string = '';
-    let password: string = '';
     let showPassword: boolean = false;
 
-    const handleSubmit = () => {
-        // Add your login logic here
-        console.log('Login attempt:', { username, password });
-    };
+    let formData = {
+    username: "",
+    password: "",
+  };
 
-    async function loginUser() {
+    let error: string | null = null;
+
+    async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    error = null;
+
+    try {
+      const response = await api.post("login", formData);
+
+      if (response.status.remarks === "success") {
+        /* const { token, user } = response.payload; */
         goto("/dashboard");
+      } else {
+        error = response.status.message || "Login failed";
+      }
+    } catch (err: any) {
+      error = err.message;
     }
+  }
 </script>
 
 <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -34,7 +49,7 @@
                     Username
                 </label>
                 <input 
-                    bind:value={username}
+                    bind:value={formData.username}
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                     id="username" 
                     type="text" 
@@ -48,12 +63,13 @@
                 </label>
                 <div class="relative">
                     <input 
-                        bind:value={password}
+                        bind:value={formData.password}
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline pr-10" 
                         id="password" 
                         type={showPassword ? 'text' : 'password'} 
                         placeholder="********"
                     >
+                    <!-- svelte-ignore a11y_consider_explicit_label -->
                     <button 
                         type="button"
                         class="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-gray-600 h-full"
@@ -70,7 +86,6 @@
             <button 
                 type="submit"
                 class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                on:click={loginUser}
             >
                 Sign In
             </button>

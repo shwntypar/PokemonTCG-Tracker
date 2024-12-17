@@ -1,6 +1,6 @@
 <script lang="ts">
  import Navbar from '../../lib/navbar/+navbar.svelte';
- import { api } from '$lib/navbar/services/api.ts';
+ import { api } from '$lib/services/api.ts';
  import { goto } from '$app/navigation';
 
   let selectedImage: File | null = null;
@@ -72,7 +72,7 @@
           console.log(pair[0] + ': ' + pair[1]);
       }
 
-      const response = await api.post("AddPokemonCard", submitFormData);
+      const response = await api.postFormData("AddPokemonCard", submitFormData);
       console.log('Full Response:', response);
       
       if (response.status.remarks === 'success') {

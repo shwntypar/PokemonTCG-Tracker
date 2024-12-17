@@ -14,62 +14,29 @@ class Post extends GlobalMethods
 
     public function __construct(\PDO $pdo)
     {
+        parent::__construct();
         $this->pdo = $pdo;
     }
 
+    public function getRequestData()
+    {
+        return $this->encryption->processRequestData();
+    }
+
+
     public function AddUsers($data){
         try{
-            $sql = "INSERT INTO users (first_name, last_name, username, email, password, is_superadmin) 
-        VALUES (?,?,?,?,?,?)";
+            $hashed_password = password_hash($data->password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO users (first_name, last_name, username, password) 
+        VALUES (?,?,?,?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             $data->first_name,
             $data->last_name,
             $data->username,
-            $data->email,
-            $data->password,
-            0
+            $hashed_password,
         ]);
         return $this->sendPayload(null, "success" , "User Successfully Added!", 200);
-        } catch (PDOException $e){
-            return $this->sendPayload(null, "failed", $e->getMessage(), 400);
-        }
-    }
-
-    public function AddProducts($data){
-        try{
-            $sql = "INSERT INTO product (product_name, price, description, quantity, views, images, supplier_id) 
-                    VALUES (?,?,?,?,?,?,?)";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                $data->product_name,
-                $data->price,
-                $data->description,
-                $data->quantity,
-                $data->views,
-                $data->images,
-                $data->supplier_id
-            ]);
-            return $this->sendPayload(null, "success", "Product Successfully Added!", 200);
-        } catch (PDOException $e){
-            error_log("AddProducts Error: " . $e->getMessage());
-            return $this->sendPayload(null, "failed", $e->getMessage(), 400);
-        }
-    }
-
-    public function AddSuppliers($data){
-        try{
-            $sql = "INSERT INTO supplier (supplier_name, contact_person, email, phone, address) 
-        VALUES (?,?,?,?,?)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            $data->supplier_name,
-            $data->contact_person,
-            $data->email,
-            $data->phone,
-            $data->address,
-        ]);
-        return $this->sendPayload(null, "success" , "Supplier Successfully Added!", 200);
         } catch (PDOException $e){
             return $this->sendPayload(null, "failed", $e->getMessage(), 400);
         }
@@ -84,31 +51,9 @@ class Post extends GlobalMethods
             $stmt->execute([$data->username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$user || !$data->password) {
-                return $this->sendPayload(null, "failed", "Invalid username or password", 401);
-            }   
-
-            // GENERATE JWT TOKEN
-            /* $jwt = new Jwt();
-            $payload = [
-                "id" => $user['id'],
-                "firstName" => $user['first_name'],
-                "lastName" => $user['last_name'],
-                "email" => $user['email'],
-                "role" => $user['role'],
-                'exp' => time() + (60 * 60 * 24)
-            ]; */
-
-           /*  $token = $jwt->encode($payload);
-            return $this->sendPayload([
-                'token' => $token,
-                'user' => [
-                    'id' => $user['id'],
-                    'email' => $user['email'],
-                    'first_name' => $user['first_name'],
-                    'last_name' => $user['last_name']
-                ]
-            ], "success", "Login successful", 200); */
+            if (!$user || !password_verify($data->password, $user['password'])) {
+                return $this->sendPayload(null, "failed", "Invalid email or password", 401);
+            }
             return $this->sendPayload(null, "success", "Login successful", 200);
         } catch (PDOException $e) {
             return $this->sendPayload(null, "failed", $e->getMessage(), 400);

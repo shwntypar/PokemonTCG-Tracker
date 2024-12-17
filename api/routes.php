@@ -68,16 +68,21 @@ switch ($_SERVER['REQUEST_METHOD']){
         }
     
     case 'POST':
-        $data = json_decode(file_get_contents("php://input"));
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        if (strpos($contentType, 'application/json') !== false) {
+            $data = $post->getRequestData();
+        } elseif (strpos($contentType, 'multipart/form-data') !== false) {
+            $data = $_POST;
+            $files = $_FILES;
+        } else {
+            echo "Unsupported Content Type";
+            http_response_code(415);
+            exit();
+        }
         switch($request[0]){
             case 'AddUsers':
                 echo json_encode($post->AddUsers($data));
-                break;
-            case 'AddSuppliers':
-                echo json_encode($post->AddSuppliers($data));
-                break;
-            case 'AddProducts':
-                echo json_encode($post->AddProducts($data));
                 break;
             case 'login':
                 echo json_encode($post->userLogin($data));

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Navbar from "../../lib/navbar/+navbar.svelte";
     import { onMount } from "svelte";
-    import { api } from "$lib/navbar/services/api.ts";
+    import { api } from "$lib/services/api.ts";
 
     async function getPokemonCards(){
         try{
